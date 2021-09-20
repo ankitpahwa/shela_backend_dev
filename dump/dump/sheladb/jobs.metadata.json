@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"sheladb.jobs"},{"v":2,"key":{"location.coordinates":"2dsphere"},"name":"location.coordinates_2dsphere","2dsphereIndexVersion":3,"ns":"sheladb.jobs","background":true}],"uuid":"244ca870e2dd484aa6ccd08dd03a995e"}

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"universal_shela.users_news"},{"v":2,"key":{"location.coordinates":"2dsphere"},"name":"location.coordinates_2dsphere","ns":"universal_shela.users_news","background":true,"2dsphereIndexVersion":3}],"uuid":"52c891ec8e544afcbe6bbfd67b10b5d4"}

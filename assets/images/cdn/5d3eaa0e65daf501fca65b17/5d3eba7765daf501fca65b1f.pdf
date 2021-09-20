@@ -1,0 +1,265 @@
+//
+//  AboutUsVC.swift
+//  TaxiMeter
+//
+//  Created by Netclues on 20/12/18.
+//  Copyright © 2018 Netclues. All rights reserved.
+//
+
+import UIKit
+import Alamofire
+import SCLAlertView
+
+
+class AboutUsVC: UIViewController {
+    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    @IBOutlet weak var tblView: UITableView!
+    var cmsPageList = [CmsPage]()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        getCmsPageListing()
+        tblView.tableFooterView = UIView()
+        setNavigation()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Hide the navigation bar on the this view controller
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.appDelegate.setScreenTrack(screenName:"About us", screenClass: "")
+    }
+    
+    // MARK:Navigation Design method
+    func setNavigation(){
+        navigationController?.navigationItem.title="About Us"
+        self.navigationController?.navigationBar.backgroundColor=UIColor.white
+        self.navigationItem.hidesBackButton=true
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "icon_backBtn"), style: .plain, target: self, action: #selector(self.backButtonClick))
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.gray
+    }
+    @objc func backButtonClick(){
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func getCmsPageListing(){
+        
+        let window:UIView = UIApplication.shared.windows[0]
+        self.appDelegate.activityIndicatorView = Model.displaySpinner(onView: window)
+        
+        let urlString = const.Webservice.cmsPagesUrl
+        
+        Alamofire.request(urlString, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: const.Webservice.headers).responseJSON
+            { (response:DataResponse) in
+                print(" *****\(urlString) Response >> ",response)
+                if(response.response?.statusCode == 200) {
+                    if let JSON = response.result.value {
+                        let mapResponse: [String: AnyObject] = JSON as! [String : AnyObject]
+                        guard let status:Int = mapResponse["status"] as? Int else {return}
+                        
+                        if(status == 200){
+                            let arrList = (mapResponse["pageList"] as? Array) ?? []
+                            
+                            for i in 0..<arrList.count {
+                                let dic = arrList[i] as! NSDictionary
+                                let obj = CmsPage(title: dic.object(forKey:"title") as! String, slug:dic.object(forKey: "slug") as! String)
+                                self.cmsPageList.append(obj)
+                            }
+                            
+                            self.appDelegate.facebookURL = Model.getUserDefaultString(key: "facebook")
+                            
+                            if(Model.checkNil(str: self.appDelegate.facebookURL) != ""){
+                                let obj = CmsPage(title: "Facebook" , slug: self.appDelegate.facebookURL)
+                                self.cmsPageList.append(obj)
+                            }
+                            
+                            self.tblView.reloadData()
+                            Model.removeSpinner(spinner: self.appDelegate.activityIndicatorView!)
+                        }else{
+                            //Show error Message here
+                            Model.removeSpinner(spinner: self.appDelegate.activityIndicatorView!)
+                            self.showERRORAlert(title: const.ErrorMessage.title, subTitle: const.ErrorMessage.somethingWentWrongMsg)
+                        }
+                    }else{
+                        //Show error Message here
+                        Model.removeSpinner(spinner: self.appDelegate.activityIndicatorView!)
+                        self.showERRORAlert(title: const.ErrorMessage.title, subTitle: const.ErrorMessage.somethingWentWrongMsg)
+                    }
+                } else{
+                    Model.removeSpinner(spinner: self.appDelegate.activityIndicatorView!)
+                    self.showErrorAlert(title:const.ErrorMessage.title , subTitle: const.ErrorMessage.somethingWentWrongMsg)
+                }
+        }
+    }
+    
+    func showErrorAlert(title:String,subTitle:String){
+        
+        let appearance = SCLAlertView.SCLAppearance(
+            kTitleFont: UIFont(name: "Avenir Heavy", size: 20)!,
+            kTextFont: UIFont(name: "Avenir Medium", size: 15)!,
+            kButtonFont: UIFont(name: "Avenir Heavy", size: 18)!,
+            showCloseButton:false, shouldAutoDismiss: true,
+            buttonCornerRadius:18
+        )
+        
+        let alert = SCLAlertView(appearance: appearance)
+        _=alert.addButton("OK", action: {
+            self.navigationController?.popViewController(animated: true)
+        })
+        
+        _ = alert.showError(title, subTitle: subTitle, closeButtonTitle: nil, timeout: nil, colorStyle:0x1aa5e3 , colorTextButton: 0xFFFFFF, circleIconImage: nil, animationStyle: .topToBottom)
+    }
+    
+    
+    
+    func showNoInternetAlert(){
+        
+        let alertController = UIAlertController (title: const.ErrorMessage.title, message:const.ErrorMessage.noInternetMsg, preferredStyle: .alert)
+        
+        let settingsAction = UIAlertAction(title: "Ok", style: .default) { (_) -> Void in
+            //method to call
+        }
+        alertController.addAction(settingsAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { (_) -> Void in
+        }
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    func showCommingSoon(){
+        
+        let alertController = UIAlertController (title: const.comingSoonMessage.title, message:const.comingSoonMessage.message, preferredStyle: .alert)
+        
+        let settingsAction = UIAlertAction(title: "Ok", style: .default) { (_) -> Void in
+            
+        }
+        alertController.addAction(settingsAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default) { (_) -> Void in
+            
+        }
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    func showERRORAlert(title:String,subTitle:String){
+        
+        let appearance = SCLAlertView.SCLAppearance(
+            kTitleFont: UIFont(name: "Avenir Heavy", size: 20)!,
+            kTextFont: UIFont(name: "Avenir Medium", size: 15)!,
+            kButtonFont: UIFont(name: "Avenir Heavy", size: 18)!,
+            showCloseButton:false, shouldAutoDismiss: true,
+            buttonCornerRadius:18
+        )
+        
+        let alert = SCLAlertView(appearance: appearance)
+        _=alert.addButton("OK", action: {
+            Model.removeSpinner(spinner: self.appDelegate.activityIndicatorView!)
+            self.navigationController?.popToRootViewController(animated: true)
+        })
+        
+        _ = alert.showError(title, subTitle: subTitle, closeButtonTitle: nil, timeout: nil, colorStyle:0x1aa5e3 , colorTextButton: 0xFFFFFF, circleIconImage: nil, animationStyle: .topToBottom)
+    }
+    
+    
+}
+
+
+extension AboutUsVC : UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        if(indexPath.row == (self.cmsPageList.count-1)){
+            return 60
+        }else{
+            return  45
+        }
+        //  return  45//UITableViewAutomaticDimension//DataTableViewCell.height()
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(Connectivity.isConnectedToInternet == true) {
+            
+            let indexPath = tblView.indexPathForSelectedRow //optional, to get from any UIButton for example
+            let cmsPageObj = cmsPageList[((indexPath?.row)!)]
+            
+            if(indexPath!.row == (self.cmsPageList.count-1)){
+                self.tblView.deselectRow(at: indexPath!, animated: true)
+                
+                if(cmsPageObj.title == "Facebook"){
+                    let facebookUrl = NSURL(string: self.appDelegate.facebookURL)
+                    if UIApplication.shared.canOpenURL(facebookUrl! as URL) {
+                        UIApplication.shared.openURL(facebookUrl! as URL)
+                    } else {
+                        //redirect to safari because the user doesn't have Instagram
+                        UIApplication.shared.openURL(NSURL(string: self.appDelegate.facebookURL)! as URL)
+                    }
+                }else{
+                    let window:UIView = UIApplication.shared.windows[0]
+                    self.appDelegate.activityIndicatorView = Model.displaySpinner(onView: window)
+                    
+                    self.tblView.deselectRow(at: indexPath!, animated: true)
+                    let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "WebViewVC") as? WebViewVC
+                    vc?.cmsObj=cmsPageObj
+                    vc?.isFromContactUs=false
+                    vc?.title=cmsPageObj.title
+                    self.navigationController?.pushViewController(vc!, animated: true)
+                }
+                
+            }else{
+                
+                let window:UIView = UIApplication.shared.windows[0]
+                self.appDelegate.activityIndicatorView = Model.displaySpinner(onView: window)
+                
+                self.tblView.deselectRow(at: indexPath!, animated: true)
+                let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "WebViewVC") as? WebViewVC
+                vc?.cmsObj=cmsPageObj
+                vc?.isFromContactUs=false
+                vc?.title=cmsPageObj.title
+                self.navigationController?.pushViewController(vc!, animated: true)
+            }
+        }else{
+            Model.setCustomErrorAlert(title: const.ErrorMessage.title, subTitle: const.ErrorMessage.noInternetMsg)
+        }
+    }
+}
+
+extension AboutUsVC : UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.cmsPageList.count;
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        
+        if(indexPath.row == (self.cmsPageList.count-1)){
+            
+            let obj = self.cmsPageList[indexPath.row]
+            
+            if(obj.title == "Facebook"){
+                let cell = tblView.dequeueReusableCell(withIdentifier: "LinkTVCell") as! LinkTVCell
+                cell.btnFacebook.setTitle(obj.title, for: UIControlState.normal)
+                
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+                cell.selectionStyle = .none
+                
+                return cell
+            }else{
+                
+                let cell = tblView.dequeueReusableCell(withIdentifier: "CmsTVCell") as! CmsTVCell
+                let obj = self.cmsPageList[indexPath.row]
+                cell.selectionStyle = .none
+                cell.lblTitle.text = obj.title
+                return cell
+            }
+        }else{
+            let cell = tblView.dequeueReusableCell(withIdentifier: "CmsTVCell") as! CmsTVCell
+            let obj = self.cmsPageList[indexPath.row]
+            cell.selectionStyle = .none
+            cell.lblTitle.text = obj.title
+            return cell
+        }
+        
+    }
+}
+
+

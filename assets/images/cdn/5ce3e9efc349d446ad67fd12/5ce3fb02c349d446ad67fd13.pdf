@@ -1,0 +1,33 @@
+//
+//  SetupViewController.h
+//  ChatSecure
+//
+//  Created by Netclues on 11/07/15.
+//  Copyright (c) 2015 Chris Ballinger. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "TJSpinner.h"
+#import "Webservice.h"
+#import "SDWebImageOperation.h"
+#import "OTRXMPPManager.h"
+
+@interface SetupViewController : UIViewController<XMPPStreamDelegate> {
+    IBOutlet UIView *initilizeView;
+    NSMutableArray *mappings;
+     id <SDWebImageOperation> _webImageOperation;
+}
+
+//@property (nonatomic, weak) id OTRXMPPRegisterFailedNotificationNameObject;
+//@property (nonatomic, weak) id OTRXMPPRegisterSucceededNotificationNameObject;
+//@property (nonatomic, weak) id kOTRProtocolLoginFailObject;
+//@property (nonatomic, weak) id kOTRProtocolLoginSuccessObject;
+
+@property (nonatomic, strong) id otherData;
+@property (nonatomic, strong) NSString *task;
+@property (nonatomic, strong) NSMutableDictionary *loginDict;
+
+@property (nonatomic)  BOOL isXMPPErrorAlertShow;
+@property (nonatomic)  BOOL isXMPPLoginFailed;
+
+@end

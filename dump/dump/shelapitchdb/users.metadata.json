@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"shelapitchdb.users"},{"v":2,"key":{"location.coordinates":"2dsphere"},"name":"location.coordinates_2dsphere","ns":"shelapitchdb.users","background":true,"2dsphereIndexVersion":3}],"uuid":"6464b14c8a6a41248b6985fe43abb699"}

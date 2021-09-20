@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"sheladb.old_users"},{"v":2,"key":{"location.coordinates":"2dsphere"},"name":"location.coordinates_2dsphere","ns":"sheladb.old_users","background":true,"2dsphereIndexVersion":3}],"uuid":"035f69453ca147a7b1bdf920edd39b2c"}

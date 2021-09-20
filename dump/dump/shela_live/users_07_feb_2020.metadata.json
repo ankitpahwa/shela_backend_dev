@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"shela_live.users_07_feb_2020"},{"v":2,"key":{"location.coordinates":"2dsphere"},"name":"location.coordinates_2dsphere","ns":"shela_live.users_07_feb_2020","background":true,"2dsphereIndexVersion":3}],"uuid":"9f8d4b1954c5402aad5e0cf4cd7699f5"}
